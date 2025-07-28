@@ -16,12 +16,12 @@ We built the game using a **starter FPS template** for fps and lightning and som
 ---
 
 ## Features  
-✅ **Immersive First-Person Gameplay** – Explore and interact with the environment.  
-✅ **Dynamic Lighting** – Atmospheric lighting enhances the horror experience.  
-✅ **Interactive Objects** – Players can pick up and examine items like files and typewriters.  
-✅ **Puzzle Elements** – Solve tasks to progress deeper into the archive.  
-✅ **Horror Ambience** – Designed to keep players on edge.  
-✅ **Backend Integration** – Connected with [Folder Heaven](https://github.com/BLLALL/folder-heaven) for storing and managing in-game files/data.  
+**Immersive First-Person Gameplay** – Explore and interact with the environment.  
+**Dynamic Lighting** – Atmospheric lighting enhances the horror experience.  
+**Interactive Objects** – Players can pick up and examine items like files and typewriters.  
+**Puzzle Elements** – Solve tasks to progress deeper into the archive.  
+**Horror Ambience** – Designed to keep players on edge.  
+**Backend Integration** – Connected with [Folder Heaven](https://github.com/BLLALL/folder-heaven) for storing and managing in-game files/data.  
 
 ---
 
