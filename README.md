@@ -1,21 +1,21 @@
-# Outlast Archive 🎮  
+# Outlast Archive
 3d File Manager
 
 ---
 
-## 🌐 Live Demo  
-▶️ **Play Now:** [https://outlast-archive.web.app/](https://outlast-archive.web.app/)
+## Live Demo  
+[https://outlast-archive.web.app/](https://outlast-archive.web.app/)
 
 ---
 
-## 📖 Overview  
-**Outlast Archive** is a first-person horror game where players explore a creepy archival facility, uncover dark secrets, and survive the unknown.  
+## Overview  
+**Outlast Archive** is a first-person horror like game where players explore their files.
 
 We built the game using a **starter FPS template** for fps and lightning and some other 3d stuff if that is ok with the hackathon rules.
 
 ---
 
-## 🚀 Features  
+## Features  
 ✅ **Immersive First-Person Gameplay** – Explore and interact with the environment.  
 ✅ **Dynamic Lighting** – Atmospheric lighting enhances the horror experience.  
 ✅ **Interactive Objects** – Players can pick up and examine items like files and typewriters.  
@@ -25,16 +25,16 @@ We built the game using a **starter FPS template** for fps and lightning and som
 
 ---
 
-## 🛠️ Tech Stack  
-- Game Engine: **Unreal Engine / Unity (whichever you used)**  
+## Tech Stack  
+- WebGL: Threejs
 - Starter FPS Template for core movement and lighting  
-- **Backend:** [Folder Heaven](https://github.com/BLLALL/folder-heaven)  
+- **Backend:** Laravel [Folder Heaven](https://github.com/BLLALL/folder-heaven)  
 - **Live Demo Hosting:** Firebase – [outlast-archive.web.app](https://outlast-archive.web.app/)  
 - 3D assets sourced from **Sketchfab** (see credits below)  
 
 ---
 
-## 🎨 Assets & Credits  
+## Assets & Credits  
 The following 3D assets were used (not made by us):  
 
 - [The Room](https://sketchfab.com/3d-models/the-room-b7e2af229435406782cd0103a22e53ce) – by **Delton Hulbert**  
@@ -51,20 +51,17 @@ _All assets are credited to their original creators as per Sketchfab licensing._
 
 ---
 
-## 📂 Project Structure  
+## Project Structure  
 
 
-## ⚠️ Disclaimer  
+## Disclaimer  
 - We used a **starter FPS template** for basic gameplay and lighting.  
 - All **3D models are sourced from Sketchfab** and are **not created by us**.  
-- Backend functionalities rely on [Folder Heaven](https://github.com/BLLALL/folder-heaven).  
-- We made sure to follow the hackathon rules regarding asset usage.  
+- Backend functionalities rely on [Folder Heaven](https://github.com/BLLALL/folder-heaven).
 
 ---
 
-## 🎮 How to Play  
-1. Clone or download the repository.  
-2. Open the project in your game engine (Unity/Unreal).  
-3. Set up the backend by following the [Folder Heaven](https://github.com/BLLALL/folder-heaven) instructions.  
-4. Build and run the game.  
-5. Explore, survive, and uncover the archive’s dark secrets!
+## How to Play  
+1. Clone or download the repository.
+2. Start a live server
+3. Explore, survive, and uncover the archive’s dark secrets!
