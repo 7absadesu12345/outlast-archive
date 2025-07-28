@@ -1,5 +1,10 @@
 # Outlast Archive 🎮  
-A suspenseful first-person horror experience built for the hackathon. The game combines exploration, puzzles, and immersive 3D environments to recreate the eerie atmosphere of an abandoned archive.
+3d File Manager
+
+---
+
+## 🌐 Live Demo  
+▶️ **Play Now:** [https://outlast-archive.web.app/](https://outlast-archive.web.app/)
 
 ---
 
@@ -24,6 +29,7 @@ We built the game using a **starter FPS template** for fps and lightning and som
 - Game Engine: **Unreal Engine / Unity (whichever you used)**  
 - Starter FPS Template for core movement and lighting  
 - **Backend:** [Folder Heaven](https://github.com/BLLALL/folder-heaven)  
+- **Live Demo Hosting:** Firebase – [outlast-archive.web.app](https://outlast-archive.web.app/)  
 - 3D assets sourced from **Sketchfab** (see credits below)  
 
 ---
@@ -47,8 +53,6 @@ _All assets are credited to their original creators as per Sketchfab licensing._
 
 ## 📂 Project Structure  
 
-
----
 
 ## ⚠️ Disclaimer  
 - We used a **starter FPS template** for basic gameplay and lighting.  
