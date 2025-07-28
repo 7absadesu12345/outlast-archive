@@ -3,7 +3,7 @@
 
 ---
 
-## Live Demo  
+## Live Demo
 [https://outlast-archive.web.app/](https://outlast-archive.web.app/)
 
 ---
