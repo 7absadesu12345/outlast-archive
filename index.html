@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Outlast Archive</title>
+	<style>
+		#loadingScreen {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: linear-gradient(135deg, #000000 0%, #000000 100%);
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			z-index: 1000;
+			color: rgb(255, 255, 255);
+			transition: opacity 0.5s ease-out;
+		}
+
+		#loadingScreen.hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.loading-title {
+			font-size: 3rem;
+			font-weight: bold;
+			margin-bottom: 2rem;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		}
+
+		.loading-progress {
+			width: 300px;
+			height: 8px;
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 4px;
+			overflow: hidden;
+			margin-bottom: 1rem;
+		}
+
+		.loading-bar {
+			height: 100%;
+			background: linear-gradient(90deg, #ffffff, #ffffff);
+			width: 0%;
+			transition: width 0.3s ease;
+			border-radius: 4px;
+		}
+
+		.loading-text {
+			font-size: 1.2rem;
+			margin-bottom: 1rem;
+		}
+
+		#startScreen {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: linear-gradient(135deg, #000000d0 0%, #0000007e 100%);
+			display: none;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			z-index: 999;
+			color: rgb(0, 0, 0);
+			transition: opacity 0.5s ease-out;
+		}
+
+		#startScreen.show {
+			display: flex;
+		}
+
+		#startScreen.hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.start-title {
+			font-size: 2.5rem;
+			font-weight: bold;
+			margin-bottom: 3rem;
+			color: white;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		}
+
+		.start-button {
+			background: rgba(255, 255, 255, 0.2);
+			border: 2px solid white;
+			color: white;
+			padding: 15px 30px;
+			font-size: 1.2rem;
+			border-radius: 10px;
+			cursor: pointer;
+			margin: 10px;
+			transition: all 0.3s ease;
+			backdrop-filter: blur(10px);
+		}
+
+		.start-button:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+		}
+
+		#registrationOverlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: rgba(0, 0, 0, 0.339);
+			display: none;
+			justify-content: center;
+			align-items: center;
+			z-index: 1001;
+			backdrop-filter: blur(5px);
+		}
+
+		#registrationOverlay.show {
+			display: flex;
+		}
+
+		.registration-form {
+			background: rgba(0, 0, 0, 0.709);
+			padding: 40px;
+			border-radius: 20px;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+			max-width: 400px;
+			width: 90%;
+			backdrop-filter: blur(20px);
+		}
+
+		.registration-form h2 {
+			color: #ffffff;
+			text-align: center;
+			margin-bottom: 30px;
+			font-size: 2rem;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			color: #ffffff;
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
+
+		.form-group input {
+			width: 100%;
+			padding: 12px;
+			background-color: #191919ab;
+			color: #ffffff;
+			border: 2px solid #4242429b;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: border-color 0.3s ease;
+			box-sizing: border-box;
+		}
+
+		.form-group input:focus {
+			outline: none;
+			border-color: #000000;
+		}
+
+		.form-buttons {
+			display: flex;
+			gap: 15px;
+			margin-top: 30px;
+		}
+
+		.form-button {
+			flex: 1;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 8px;
+			font-size: 1rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.register-btn {
+			background: linear-gradient(135deg, #000000d0 0%, #0000007e 100%);
+			color: white;
+		}
+
+		.register-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+		}
+
+		.cancel-btn {
+			background: #f0f0f0;
+			color: #333;
+		}
+
+		.cancel-btn:hover {
+			background: #e0e0e0;
+		}
+
+		.error-message {
+			color: #ff4444;
+			font-size: 0.9rem;
+			margin-top: 5px;
+			display: none;
+		}
+
+		body {
+			margin: 0;
+			overflow: hidden;
+			font-family: Arial, sans-serif;
+		}
+
+		#container {
+			width: 100vw;
+			height: 100vh;
+			display: block;
+		}
+
+		#crosshair {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			width: 10px;
+			height: 10px;
+			background-color: red;
+			border-radius: 100px;
+			transform: translate(-50%, -50%);
+			pointer-events: none;
+			z-index: 100;
+			transition: border-radius 0.1s ease, background-color 0.1s ease, width 0.1s ease, height 0.1s ease;
+			display: none;
+		}
+
+    .bottom-left-text {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      font-size: 18px;
+      font-family: Arial, sans-serif;
+    }
+	    .fixed-text {
+      position: fixed;
+      left: 10px;
+      color: white;
+      font-size: 8px;
+      font-family: Arial, sans-serif;
+    }
+
+    #text1 { bottom: 10px; }
+    #text2 { bottom: 35px; }
+    #text3 { top: 10px; }
+		#crosshair.hovering {
+			background-color: green;
+		}
+	</style>
+	<meta charset=utf-8 />
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<div id="crosshair"></div>
+
+</head>
+
+<body>
+	<div id="container"></div>
+	<div id="loadingScreen">
+		<div class="loading-title">Outlast Archive</div>
+		<div class="loading-progress">
+			<div class="loading-bar" id="loadingBar"></div>typewriter
+		</div>
+		<div class="loading-text" id="loadingText">Arranging Files... 0%</div>
+	</div>
+	<div id="startScreen">
+		<div class="start-title">Welcome to Outlast Archive</div>
+		<button class="start-button" id="startButton">Click anywhere to start</button>
+		<button class="start-button" id="newUserButton">New Employee? Click here</button>
+	</div>
+	<div id="registrationOverlay">
+		<div class="registration-form">
+			<h2>Apply for a new jop</h2>
+			<form id="registrationForm">
+				<div class="form-group">
+					<label for="regName">Name:</label>
+					<input type="text" id="regName" name="name" required>
+					<div class="error-message" id="nameError"></div>
+				</div>
+				<div class="form-group">
+					<label for="regEmail">Email (to write using typewriter):</label>
+					<input type="email" id="regEmail" name="email" required>
+					<div class="error-message" id="emailError"></div>
+				</div>
+				<div class="form-group">
+					<label for="regPassword">Password (numbers only):</label>
+					<input type="password" id="regPassword" name="password" required minlength="8">
+					<div class="error-message" id="passwordError"></div>
+				</div>
+				<div class="form-group">
+					<label for="regPasswordConfirm">Confirm Password:</label>
+					<input type="password" id="regPasswordConfirm" name="password_confirmation" required>
+					<div class="error-message" id="confirmError"></div>
+				</div>
+				<div class="form-buttons">
+					<button type="button" class="form-button cancel-btn" id="cancelRegister">Cancel</button>
+					<button type="submit" class="form-button register-btn">Register</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+  <div id="text1" class="bottom-left-text"></div>
+  <div id="text2" class="bottom-left-text" style="bottom: 35px;"></div> 
+  <div id="text3" class="fixed-text"></div>
+
+	<script type="importmap">
+	      {
+	        "imports": {
+	          "three": "https://cdn.jsdelivr.net/npm/three@v0.148.0/build/three.module.js",
+	          "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.148.0/examples/jsm/"
+	        }
+	      }
+	    </script>
+
+	<script type="module">
+		import * as THREE from 'three';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { Octree } from 'three/addons/math/Octree.js';
+		import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+		import { Capsule } from 'three/addons/math/Capsule.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+		import axios from "https://cdn.jsdelivr.net/npm/axios@1.7.7/+esm";
+
+		async function loginWithAxios(credentials) {
+			try {
+				await axios.get('https://folderheaven.ddns.net/sanctum/csrf-cookie');
+
+				const response = await axios.post('https://folderheaven.ddns.net/api/login', credentials);
+
+				console.log('Login Success:', response.data);
+
+				const token = response.data.data.token;
+				localStorage.setItem('authToken', token);
+
+				return response.data;
+			} catch (error) {
+				console.error('Login Error:', error.response?.data || error.message);
+				throw error;
+			}
+		}
+
+		async function logoutWithAxios() {
+			try {
+				const token = localStorage.getItem('authToken');
+
+				if (!token) {
+					console.warn('No auth token found');
+					return;
+				}
+
+				await axios.get('https://folderheaven.ddns.net/sanctum/csrf-cookie');
+
+				const response = await axios.post('https://folderheaven.ddns.net/api/logout', {}, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+
+				console.log('Logout Success:', response.data);
+
+				localStorage.removeItem('authToken');
+
+				return response.data;
+			} catch (error) {
+				console.error('Logout Error:', error.response?.data || error.message);
+
+				localStorage.removeItem('authToken');
+				throw error;
+			}
+		}
+
+		async function getCurrentUserWithAxios() {
+			try {
+				const token = localStorage.getItem('authToken');
+
+				if (!token) {
+					throw new Error('No auth token found. Please login first.');
+				}
+
+				await axios.get('https://folderheaven.ddns.net/sanctum/csrf-cookie');
+
+				const response = await axios.get('https://folderheaven.ddns.net/api/user', {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+
+				console.log('Get User Success:', response.data);
+				return response.data;
+			} catch (error) {
+				console.error('Get User Error:', error.response?.data || error.message);
+
+				if (error.response?.status === 401) {
+					localStorage.removeItem('authToken');
+				}
+
+				throw error;
+			}
+		}
+
+		async function registerWithAxios(userData) {
+			try {
+				await axios.get('https://folderheaven.ddns.net/sanctum/csrf-cookie');
+
+				const response = await axios.post('https://folderheaven.ddns.net/api/register', userData);
+
+				console.log('Register Success:', response.data);
+
+				const token = response.data.data.token;
+				localStorage.setItem('authToken', token);
+
+				return response.data;
+			} catch (error) {
+				console.error('Register Error:', error.response?.data || error.message);
+				throw error;
+			}
+		}
+
+		document.getElementById("text3").innerHTML = "F for Flash Light<br>WASD for movement<br>RMB to zoom<br>LMB to interact<br>Interact with the folder in the shelf after you login<br>Login via the typewriter (email) and door passcode lock (password) and the door will open automatically<br>Interact with the backdoor to logout";
+
+		let filesData = [];
+		let papers = [];
+		let isAnimatingPapers = false;
+		const SERVER_URL = 'https://folderheaven.ddns.net';
+
+		async function fetchFilesWithAxios(page = 1) {
+			try {
+				const token = localStorage.getItem('authToken');
+
+				if (!token) {
+					throw new Error('No auth token found. Please login first.');
+				}
+
+				await axios.get(`${SERVER_URL}/sanctum/csrf-cookie`);
+
+				const response = await axios.get(`${SERVER_URL}/api/files?page=${page}`, {
+					headers: {
+						'Authorization': `Bearer ${token}`
+					}
+				});
+
+				console.log('Files fetched successfully:', response.data);
+				filesData = response.data.data.filter(item => !item.is_folder);
+				return response.data;
+			} catch (error) {
+				console.error('Fetch Files Error:', error.response?.data || error.message);
+
+				if (error.response?.status === 401) {
+					localStorage.removeItem('authToken');
+				}
+
+				throw error;
+			}
+		}
+
+		function createTextTexture(text, fontSize = 32) {
+			return new Promise((resolve) => {
+				const canvas = document.createElement('canvas');
+				const context = canvas.getContext('2d');
+				canvas.width = 512;
+				canvas.height = 256;
+
+				context.fillStyle = 'rgba(255, 255, 255, 0.95)';
+				context.fillRect(0, 0, canvas.width, canvas.height);
+
+				context.strokeStyle = '#333333';
+				context.lineWidth = 4;
+				context.strokeRect(0, 0, canvas.width, canvas.height);
+
+				context.fillStyle = '#333333';
+				context.font = `bold ${fontSize}px Arial`;
+				context.textAlign = 'center';
+				context.textBaseline = 'middle';
+
+				const words = text.split(' ');
+				let lines = [];
+				let currentLine = '';
+
+				words.forEach(word => {
+					const testLine = currentLine + word + ' ';
+					const metrics = context.measureText(testLine);
+					if (metrics.width > canvas.width - 40 && currentLine !== '') {
+						lines.push(currentLine.trim());
+						currentLine = word + ' ';
+					} else {
+						currentLine = testLine;
+					}
+				});
+				lines.push(currentLine.trim());
+
+				const lineHeight = 40;
+				const startY = canvas.height / 2 - (lines.length - 1) * lineHeight / 2;
+				lines.forEach((line, index) => {
+					context.fillText(line, canvas.width / 2, startY + index * lineHeight);
+				});
+
+				const texture = new THREE.CanvasTexture(canvas);
+				texture.needsUpdate = true;
+				resolve(texture);
+			});
+		}
+
+		function formatFileSize(bytes) {
+			if (bytes === 0) return '0 Bytes';
+			const k = 1024;
+			const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+			const i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		}
+
+		async function createPaper(fileData, index, folderPosition) {
+			const paperGeometry = new THREE.PlaneGeometry(0.8, 1.2);
+
+			const fileInfo = `${fileData.name}\n\nSize: ${formatFileSize(fileData.size)}\nType: ${fileData.mime_type || 'Unknown'}\nOwner: ${fileData.owner?.attributes?.name || 'Unknown'}`;
+
+			const texture = await createTextTexture(fileInfo, 24);
+			const paperMaterial = new THREE.MeshLambertMaterial({
+				map: texture,
+				transparent: true,
+				side: THREE.DoubleSide
+			});
+
+			const paper = new THREE.Mesh(paperGeometry, paperMaterial);
+
+			paper.position.copy(folderPosition);
+			paper.position.y += 0.1;
+
+			paper.rotation.z = (Math.random() - 0.5) * 0.3;
+			paper.rotation.x = Math.PI / 2;
+
+			paper.castShadow = true;
+			paper.receiveShadow = true;
+			paper.userData = { fileData, index, isAnimating: false };
+
+			scene.add(paper);
+			papers.push(paper);
+
+			return paper;
+		}
+
+		async function animatePapersOut(folderObject) {
+			if (isAnimatingPapers || papers.length > 0 || filesData.length === 0) return;
+
+			isAnimatingPapers = true;
+			const folderPosition = folderObject.position.clone();
+
+			const paperPromises = filesData.map((file, index) =>
+				createPaper(file, index, folderPosition)
+			);
+
+			const createdPapers = await Promise.all(paperPromises);
+
+			createdPapers.forEach((paper, index) => {
+				const delay = index * 150;
+
+				setTimeout(() => {
+					animateSinglePaper(paper, folderPosition, index);
+				}, delay);
+			});
+
+			setTimeout(() => {
+				isAnimatingPapers = false;
+			}, filesData.length * 150 + 2000);
+		}
+
+		function animateSinglePaper(paper, folderPosition, index) {
+			const startPos = paper.position.clone();
+
+			const angle = (index / filesData.length) * Math.PI * 1.5 + Math.random() * 0.3;
+			const radius = 1.5 + Math.random() * 1;
+			const height = Math.random() * 0.8 + 0.5;
+
+			const targetPos = new THREE.Vector3(
+				folderPosition.x + Math.cos(angle) * radius,
+				folderPosition.y + height,
+				folderPosition.z + Math.sin(angle) * radius
+			);
+
+			const duration = 1500 + Math.random() * 500;
+			const startTime = Date.now();
+
+			paper.userData.isAnimating = true;
+
+			function animate() {
+				const elapsed = Date.now() - startTime;
+				const progress = Math.min(elapsed / duration, 1);
+
+				const easeOut = 1 - Math.pow(1 - progress, 3);
+
+				paper.position.lerpVectors(startPos, targetPos, easeOut);
+
+				paper.rotation.x = Math.PI / 2 + Math.sin(progress * Math.PI * 3) * 0.3;
+				paper.rotation.y = Math.cos(progress * Math.PI * 2) * 0.2;
+				paper.rotation.z += 0.01;
+
+				if (progress < 1) {
+					requestAnimationFrame(animate);
+				} else {
+					paper.userData.isAnimating = false;
+					paper.userData.floatOffset = Math.random() * Math.PI * 2;
+					paper.userData.floatSpeed = 0.5 + Math.random() * 0.5;
+				}
+			}
+
+			animate();
+		}
+
+		function collectPapers() {
+			papers.forEach(paper => {
+				paper.userData.isAnimating = false;
+				scene.remove(paper);
+				if (paper.material.map) {
+					paper.material.map.dispose();
+				}
+				paper.material.dispose();
+				paper.geometry.dispose();
+			});
+			papers = [];
+		}
+
+		let loadingProgress = 0;
+		const loadingScreen = document.getElementById('loadingScreen');
+		const startScreen = document.getElementById('startScreen');
+		const registrationOverlay = document.getElementById('registrationOverlay');
+		const loadingBar = document.getElementById('loadingBar');
+		const loadingText = document.getElementById('loadingText');
+
+		function updateLoadingProgress(percent) {
+			loadingProgress = Math.min(100, Math.max(0, percent));
+			loadingBar.style.width = loadingProgress + '%';
+			loadingText.textContent = `Arranging Files... ${Math.round(loadingProgress)}%`;
+
+			if (loadingProgress >= 100) {
+				setTimeout(() => {
+					loadingScreen.classList.add('hidden');
+					setTimeout(() => {
+						loadingScreen.style.display = 'none';
+						startScreen.classList.add('show');
+					}, 500);
+				}, 500);
+			}
+		}
+
+		document.getElementById('startButton').addEventListener('click', startApplication);
+		document.getElementById('newUserButton').addEventListener('click', showRegistration);
+
+		document.getElementById('cancelRegister').addEventListener('click', hideRegistration);
+		document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
+
+		startScreen.addEventListener('click', (e) => {
+			if (e.target === startScreen) {
+				startApplication();
+			}
+		});
+
+		function startApplication() {
+			startScreen.classList.add('hidden');
+			setTimeout(() => {
+				startScreen.style.display = 'none';
+				document.getElementById('container').style.display = 'block';
+			}, 500);
+		}
+
+		function showRegistration() {
+			registrationOverlay.classList.add('show');
+		}
+
+		function hideRegistration() {
+			registrationOverlay.classList.remove('show');
+			clearFormErrors();
+		}
+
+		async function handleRegistration(e) {
+			e.preventDefault();
+			clearFormErrors();
+
+			const formData = new FormData(e.target);
+			const userData = {
+				name: formData.get('name'),
+				email: formData.get('email'),
+				password: formData.get('password'),
+				password_confirmation: formData.get('password_confirmation')
+			};
+
+			if (userData.password !== userData.password_confirmation) {
+				showError('confirmError', 'Passwords do not match');
+				return;
+			}
+
+			try {
+				// Disable form while registering
+				const form = document.getElementById('registrationForm');
+				const submitBtn = form.querySelector('.register-btn');
+				submitBtn.textContent = 'Registering...';
+				submitBtn.disabled = true;
+
+				await registerWithAxios(userData);
+
+				hideRegistration();
+				startApplication();
+
+			} catch (error) {
+				if (error.response && error.response.data && error.response.data.errors) {
+					const errors = error.response.data.errors;
+
+					if (errors.name) showError('nameError', errors.name[0]);
+					if (errors.email) showError('emailError', errors.email[0]);
+					if (errors.password) showError('passwordError', errors.password[0]);
+				} else {
+					showError('emailError', 'Registration failed. Please try again.');
+				}
+			} finally {
+				const form = document.getElementById('registrationForm');
+				const submitBtn = form.querySelector('.register-btn');
+				submitBtn.textContent = 'Register';
+				submitBtn.disabled = false;
+			}
+		}
+
+		function showError(elementId, message) {
+			const errorElement = document.getElementById(elementId);
+			errorElement.textContent = message;
+			errorElement.style.display = 'block';
+		}
+
+		function clearFormErrors() {
+			const errorElements = document.querySelectorAll('.error-message');
+			errorElements.forEach(el => {
+				el.style.display = 'none';
+				el.textContent = '';
+			});
+		}
+
+		updateLoadingProgress(0);
+
+		document.getElementById('crosshair').style.display = 'block';
+
+		let password = "";
+		let email = "";
+		let door_handle;
+
+		let fan;
+		let fan1;
+		let fan2;
+		let fan3;
+		let fan4;
+		let fan5;
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.set(2, 2, 5);
+
+		const new_listener = new THREE.AudioListener();
+		camera.add(new_listener);
+
+		const renderer = new THREE.WebGLRenderer({
+			antialias: true,
+			powerPreference: "high-performance",
+			logarithmicDepthBuffer: false,
+			precision: "mediump"
+		});
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		const ambientLight = new THREE.AmbientLight(0x404040, 0.1);
+		scene.add(ambientLight);
+		const light = new THREE.PointLight(0xEEEEFF, 20 * 0.001, 400);
+		light.position.set(2.280369520187378, 3, -0.09127738326787949);
+		scene.add(light);
+		const light2 = new THREE.PointLight(0xEEEEFF, 20 * 0.001, 400);
+		light2.position.set(2.280369520187378, 3, -4.02218);
+		scene.add(light2);
+		const light3 = new THREE.PointLight(0xEEEEFF, 20 * 0.001, 400);
+		light3.position.set(2.280369520187378, 3, -7.94164);
+		scene.add(light3);
+		const light4 = new THREE.PointLight(0xEEEEFF, 20 * 0.001, 400);
+		light4.position.set(2.280369520187378, 3, 3.82218);
+		scene.add(light4);
+		const light5 = new THREE.PointLight(0xEEEEFF, 20 * 0.001, 400);
+		light5.position.set(2.280369520187378, 3, 7.74164);
+		scene.add(light5);
+		const flashlight = new THREE.SpotLight(0xffffff, 1.5, 20, Math.PI * 0.12, 0.5, 2);
+		flashlight.position.copy(camera.position);
+		flashlight.target.position.copy(camera.position);
+		flashlight.target.position.z -= 1;
+		flashlight.castShadow = true;
+		flashlight.shadow.mapSize.width = 512;
+		flashlight.shadow.mapSize.height = 512;
+		flashlight.shadow.camera.near = 0.5;
+		flashlight.shadow.camera.far = 25;
+		flashlight.shadow.bias = -0.0001;
+		flashlight.shadow.normalBias = 0.02;
+		scene.add(flashlight);
+		scene.add(flashlight.target);
+
+		let flashlightOn = false;
+		flashlight.intensity = 0;
+
+		function toggleFlashlight() {
+			flashlightOn = !flashlightOn;
+		}
+
+		function updateFlashlight() {
+			if (flashlightOn) {
+				const offset = new THREE.Vector3(0.1, -0.1, 0);
+				flashlight.position.copy(camera.position).add(offset);
+
+				const direction = new THREE.Vector3();
+				camera.getWorldDirection(direction);
+				flashlight.target.position.copy(camera.position).add(direction.multiplyScalar(5));
+
+				flashlight.intensity = 1.5;
+			} else {
+				flashlight.intensity = 0
+			}
+		}
+
+		const clock = new THREE.Clock();
+		camera.rotation.order = 'YXZ';
+
+		const container = document.getElementById('container');
+		const crosshair = document.getElementById('crosshair');
+
+
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 0.75));
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setAnimationLoop(animate);
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		container.appendChild(renderer.domElement);
+		const renderPass = new RenderPass(scene, camera);
+
+		const gammaCorrection = new ShaderPass(GammaCorrectionShader);
+
+		const composer = new EffectComposer(renderer);
+		composer.addPass(renderPass);
+		composer.addPass(gammaCorrection);
+		const raycaster = new THREE.Raycaster();
+		const mouse = new THREE.Vector2(0, 0);
+
+		let selectedObject = null;
+		let originalTransform = null;
+		let hoveredObject = null;
+		let originalMaterial = null;
+		let highlightMaterial = null;
+
+		highlightMaterial = new THREE.MeshBasicMaterial({
+			color: 0xffff00,
+			transparent: true,
+			opacity: 0.3,
+			side: THREE.DoubleSide
+		});
+
+		const GRAVITY = 30;
+
+		const STEPS_PER_FRAME = 2;
+
+		const worldOctree = new Octree();
+
+		const playerCollider = new Capsule(
+			new THREE.Vector3(0, 0.5, 0),
+			new THREE.Vector3(0, 2.8, 0),
+			0.25
+		);
+
+		const playerVelocity = new THREE.Vector3();
+		const playerDirection = new THREE.Vector3();
+
+		let playerOnFloor = false;
+		let mouseTime = 0;
+
+		const keyStates = {};
+
+		const vector1 = new THREE.Vector3();
+		const vector2 = new THREE.Vector3();
+		const vector3 = new THREE.Vector3();
+
+		let intersectableObjects = [];
+
+		let lastRaycastTime = 0;
+		const RAYCAST_THROTTLE = 100;
+
+		document.addEventListener('keydown', (event) => {
+			keyStates[event.code] = true;
+			if (event.code === 'KeyF') {
+				toggleFlashlight();
+			}
+		});
+		document.addEventListener('keyup', (event) => {
+			keyStates[event.code] = false;
+
+		});
+		let originalFov = camera.fov;
+		let targetFov = originalFov;
+		let increasedFov = originalFov - 50;
+		let isPointerLocked = false;
+		let isRightMouseDown = false;
+
+		container.addEventListener('mousedown', (event) => {
+			if (event.button === 0) {
+				document.body.requestPointerLock();
+				mouseTime = performance.now();
+			}
+		});
+
+		document.addEventListener('pointerlockchange', () => {
+			isPointerLocked = document.pointerLockElement === document.body;
+		});
+
+		document.addEventListener('mousedown', (event) => {
+			if (isPointerLocked && event.button === 2) {
+				isRightMouseDown = true;
+				targetFov = increasedFov;
+			}
+		});
+
+		document.addEventListener('mouseup', (event) => {
+			if (isPointerLocked && event.button === 2) {
+				isRightMouseDown = false;
+				targetFov = originalFov;
+			}
+		});
+
+		container.addEventListener('contextmenu', (event) => {
+			event.preventDefault();
+		});
+
+		function animateFov() {
+			camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, 0.6);
+			camera.updateProjectionMatrix();
+		}
+		function performRaycast() {
+			const now = performance.now();
+			if (now - lastRaycastTime < RAYCAST_THROTTLE) {
+				return null;
+			}
+			lastRaycastTime = now;
+
+			raycaster.setFromCamera(mouse, camera);
+
+			const frustum = new THREE.Frustum();
+			const matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+			frustum.setFromProjectionMatrix(matrix);
+
+			const visibleObjects = intersectableObjects.filter(obj =>
+				frustum.intersectsObject(obj)
+			);
+
+			const intersects = raycaster.intersectObjects(visibleObjects, true);
+			return intersects.length > 0 ? intersects[0].object : null;
+		}
+
+		function highlightObject(object) {
+			if (hoveredObject !== object) {
+				if (hoveredObject && originalMaterial) {
+					hoveredObject.material = originalMaterial;
+				}
+				if (object && object !== selectedObject) {
+					originalMaterial = object.material;
+					object.material = highlightMaterial;
+					crosshair.classList.add('hovering');
+				} else {
+					crosshair.classList.remove('hovering');
+				}
+
+				hoveredObject = object;
+			}
+		}
+		const ledGeometry = new THREE.CylinderGeometry(1, 1, 1, 16);
+		const ledMaterialOff = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x000000 });
+		const ledMaterialOn = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
+
+		const ledMesh = new THREE.Mesh(ledGeometry, ledMaterialOn);
+		ledMesh.name = "myled";
+
+		ledMesh.position.set(2.280369520187378, 5.67503, -0.09127738326787949);
+		ledMesh.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
+		ledMesh.scale.set(0.025000400841236115, 2.52122665643692017, 0.02500000037252903);
+		scene.add(ledMesh);
+
+		const ledLight = new THREE.PointLight(0xEEEEFF, 1, 10);
+
+		ledLight.visible = true;
+		ledMesh.add(ledLight);
+		let myled = null
+		let ledOn = true;
+
+		///////////////////////////////
+		const ledGeometry2 = new THREE.CylinderGeometry(1, 1, 1, 16);
+		const ledMaterialOn2 = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
+		const ledMesh2 = new THREE.Mesh(ledGeometry2, ledMaterialOn2);
+		ledMesh2.position.set(2.280369520187378, 5.67503, -4.02218);
+		ledMesh2.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
+		ledMesh2.scale.set(0.025000400841236115, 2.52122665643692017, 0.02500000037252903);
+		scene.add(ledMesh2);
+		const ledLight2 = new THREE.PointLight(0xEEEEFF, 1, 10);
+		ledLight2.visible = true;
+		ledMesh2.add(ledLight2);
+		//////////////////////////////
+		const ledGeometry3 = new THREE.CylinderGeometry(1, 1, 1, 16);
+		const ledMaterialOn3 = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
+		const ledMesh3 = new THREE.Mesh(ledGeometry3, ledMaterialOn3);
+		ledMesh3.position.set(2.280369520187378, 5.67503, -7.94164);
+		ledMesh3.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
+		ledMesh3.scale.set(0.025000400841236115, 2.52122665643692017, 0.02500000037252903);
+		scene.add(ledMesh3);
+		const ledLight3 = new THREE.PointLight(0xEEEEFF, 1, 10);
+		ledLight3.visible = true;
+		ledMesh3.add(ledLight3);
+		//////////////////////////////
+		const ledGeometry4 = new THREE.CylinderGeometry(1, 1, 1, 16);
+		const ledMaterialOn4 = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
+		const ledMesh4 = new THREE.Mesh(ledGeometry4, ledMaterialOn4);
+		ledMesh4.position.set(2.280369520187378, 5.67503, 3.82218);
+		ledMesh4.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
+		ledMesh4.scale.set(0.025000400841236115, 2.52122665643692017, 0.02500000037252903);
+		scene.add(ledMesh4);
+		const ledLight4 = new THREE.PointLight(0xEEEEFF, 1, 10);
+		ledLight4.visible = true;
+		ledMesh4.add(ledLight4);
+		//////////////////////////////
+		const ledGeometry5 = new THREE.CylinderGeometry(1, 1, 1, 16);
+		const ledMaterialOn5 = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
+		const ledMesh5 = new THREE.Mesh(ledGeometry5, ledMaterialOn5);
+		ledMesh5.position.set(2.280369520187378, 5.67503, 7.74164);
+		ledMesh5.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
+		ledMesh5.scale.set(0.025000400841236115, 2.52122665643692017, 0.02500000037252903);
+		scene.add(ledMesh5);
+		const ledLight5 = new THREE.PointLight(0xEEEEFF, 1, 10);
+		ledLight5.visible = true;
+		ledMesh5.add(ledLight5);
+		//////////////////////////////
+
+		function updateDoorCollider(door) {
+			if (door.geometry) {
+				door.geometry.computeBoundingBox();
+				door.geometry.computeBoundingSphere();
+			}
+
+			door.updateMatrixWorld(true);
+			if (door.userData.collider) {
+				door.userData.collider.setFromObject(door);
+			}
+			if (door.userData.boundingBox) {
+				door.userData.boundingBox.setFromObject(door);
+			}
+		}
+
+		function showLoginError(message) {
+			console.error(message);
+		}
+
+		document.addEventListener('mouseup', () => {
+			if (event.button !== 0) return;
+			const intersectedObject = performRaycast();
+
+			if (intersectedObject && intersectedObject.name === 'folder1') {
+				console.log('folder1 clicked');
+
+				if (papers.length > 0) {
+					collectPapers();
+				} else {
+					fetchFilesWithAxios()
+						.then(() => {
+							animatePapersOut(intersectedObject);
+						})
+						.catch(error => {
+							console.error('Failed to fetch files:', error);
+						});
+				}
+			}
+
+			else if ((intersectedObject && intersectedObject.name === 'key_0' ||
+				intersectedObject && intersectedObject.name === 'key_1' ||
+				intersectedObject && intersectedObject.name === 'key_2' ||
+				intersectedObject && intersectedObject.name === 'key_3' ||
+				intersectedObject && intersectedObject.name === 'key_4' ||
+				intersectedObject && intersectedObject.name === 'key_5' ||
+				intersectedObject && intersectedObject.name === 'key_6' ||
+				intersectedObject && intersectedObject.name === 'key_7' ||
+				intersectedObject && intersectedObject.name === 'key_8' ||
+				intersectedObject && intersectedObject.name === 'key_9' ||
+				intersectedObject && intersectedObject.name === 'key_*' ||
+				intersectedObject && intersectedObject.name === 'key_#'
+			)) {
+				if (intersectedObject && intersectedObject.name === 'key_0') {
+					password += "0";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_1') {
+					password += "1";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_2') {
+					password += "2";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_3') {
+					password += "3";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_4') {
+					password += "4";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_5') {
+					password += "5";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_6') {
+					password += "6";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_7') {
+					password += "7";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_8') {
+					password += "8";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_9') {
+					password += "9";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_*') {
+					password += "*";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_#') {
+					console.log("email" + email);
+					console.log("password" + password);
+					loginWithAxios({ email: email, password: password })
+						.then(loginResult => {
+							if (loginResult && loginResult.status === 200 && loginResult.data) {
+
+								document.getElementById("text1").style.display = "none";
+								document.getElementById("text2").style.display = "none";
+
+								fetchFilesWithAxios()
+									.then(response => {
+										console.log(`Loaded ${filesData.length} files for folder interaction`);
+									})
+									.catch(error => {
+										console.warn('Failed to preload files:', error);
+									});
+								email = "";
+								password = "";
+								console.log("Login successful:", loginResult.message);
+								console.log("User:", loginResult.data.attributes.name);
+
+								const doorRotationAmount = Math.PI / 2;
+								const startRotation = door_handle.rotation.y;
+								const targetRotation = startRotation + doorRotationAmount;
+								const rotationDuration = 1000;
+								const startTime = Date.now();
+
+								if (door_handle.geometry) {
+									door_handle.geometry.boundingBox = null;
+									door_handle.geometry.boundingSphere = null;
+								}
+								if (window.octree) {
+									window.octree.removeObject(door_handle);
+								}
+								if (door_handle.body) {
+									door_handle.body.collisionFilterMask = 0;
+								}
+
+								function animateDoor() {
+									const elapsed = Date.now() - startTime;
+									const progress = Math.min(elapsed / rotationDuration, 1);
+									const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+									door_handle.rotation.y =
+										startRotation + doorRotationAmount * easeProgress;
+									if (door_handle.body) {
+										door_handle.body.position.copy(door_handle.position);
+										door_handle.body.quaternion.setFromAxisAngle(
+											new CANNON.Vec3(0, 1, 0),
+											door_handle.rotation.y
+										);
+									} else if (door_handle.physics) {
+										door_handle.physics.setRotationFromEuler(door_handle.rotation);
+									}
+
+									if (progress < 1) {
+										requestAnimationFrame(animateDoor);
+									} else {
+										console.log("Door opened successfully!");
+										door_handle.userData.isOpen = true;
+									}
+								}
+
+								animateDoor();
+							} else {
+								email = "";
+								password = "";
+								console.log("Login failed");
+								showLoginError("Invalid credentials");
+							}
+						})
+						.catch(error => {
+							email = "";
+							password = "";
+
+							console.error("Login error:", error);
+							showLoginError("Login request failed");
+						});
+				}
+			}
+
+			else if ((intersectedObject && intersectedObject.name === 'key_00' ||
+				intersectedObject && intersectedObject.name === 'key_11' ||
+				intersectedObject && intersectedObject.name === 'key_22' ||
+				intersectedObject && intersectedObject.name === 'key_33' ||
+				intersectedObject && intersectedObject.name === 'key_44' ||
+				intersectedObject && intersectedObject.name === 'key_55' ||
+				intersectedObject && intersectedObject.name === 'key_66' ||
+				intersectedObject && intersectedObject.name === 'key_77' ||
+				intersectedObject && intersectedObject.name === 'key_88' ||
+				intersectedObject && intersectedObject.name === 'key_99' ||
+				intersectedObject && intersectedObject.name === 'key_a' ||
+				intersectedObject && intersectedObject.name === 'key_b' ||
+				intersectedObject && intersectedObject.name === 'key_c' ||
+				intersectedObject && intersectedObject.name === 'key_d' ||
+				intersectedObject && intersectedObject.name === 'key_e' ||
+				intersectedObject && intersectedObject.name === 'key_f' ||
+				intersectedObject && intersectedObject.name === 'key_g' ||
+				intersectedObject && intersectedObject.name === 'key_h' ||
+				intersectedObject && intersectedObject.name === 'key_i' ||
+				intersectedObject && intersectedObject.name === 'key_j' ||
+				intersectedObject && intersectedObject.name === 'key_k' ||
+				intersectedObject && intersectedObject.name === 'key_l' ||
+				intersectedObject && intersectedObject.name === 'key_m' ||
+				intersectedObject && intersectedObject.name === 'key_n' ||
+				intersectedObject && intersectedObject.name === 'key_o' ||
+				intersectedObject && intersectedObject.name === 'key_p' ||
+				intersectedObject && intersectedObject.name === 'key_q' ||
+				intersectedObject && intersectedObject.name === 'key_r' ||
+				intersectedObject && intersectedObject.name === 'key_s' ||
+				intersectedObject && intersectedObject.name === 'key_t' ||
+				intersectedObject && intersectedObject.name === 'key_u' ||
+				intersectedObject && intersectedObject.name === 'key_v' ||
+				intersectedObject && intersectedObject.name === 'key_x' ||
+				intersectedObject && intersectedObject.name === 'key_y' ||
+				intersectedObject && intersectedObject.name === 'key_z' ||
+				intersectedObject && intersectedObject.name === 'key_at' ||
+				intersectedObject && intersectedObject.name === 'key_dot'
+			)) {
+				if (intersectedObject && intersectedObject.name === 'key_00') {
+					email += "0";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_11') {
+					email += "1";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_22') {
+					email += "2";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_33') {
+					email += "3";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_44') {
+					email += "4";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_55') {
+					email += "5";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_66') {
+					email += "6";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_77') {
+					email += "7";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_88') {
+					email += "8";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_99') {
+					email += "9";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_a') {
+					email += "a";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_b') {
+					email += "b";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_c') {
+					email += "c";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_d') {
+					email += "d";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_e') {
+					email += "e";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_f') {
+					email += "f";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_g') {
+					email += "g";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_h') {
+					email += "h";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_i') {
+					email += "i";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_j') {
+					email += "j";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_k') {
+					email += "k";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_l') {
+					email += "l";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_m') {
+					email += "m";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_n') {
+					email += "n";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_o') {
+					email += "o";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_p') {
+					email += "p";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_q') {
+					email += "q";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_r') {
+					email += "r";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_s') {
+					email += "s";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_t') {
+					email += "t";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_y') {
+					email += "y";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_v') {
+					email += "v";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_x') {
+					email += "x";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_y') {
+					email += "y";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_z') {
+					email += "z";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_at') {
+					email += "@";
+				}
+				else if (intersectedObject && intersectedObject.name === 'key_dot') {
+					email += ".";
+				}
+			}
+
+			else if ((intersectedObject && intersectedObject.name === 'logout')) {
+				const logoutResult = logoutWithAxios();
+				console.log(logoutResult);
+			}
+
+		});
+
+		let lastMouseMoveTime = 0;
+		const MOUSE_MOVE_THROTTLE = 100;
+
+		document.addEventListener('mousemove', () => {
+			const now = performance.now();
+			if (document.pointerLockElement === document.body && now - lastMouseMoveTime > MOUSE_MOVE_THROTTLE) {
+				lastMouseMoveTime = now;
+				if (!selectedObject) {
+					const intersectedObject = performRaycast();
+
+					if ((intersectedObject && intersectedObject.name === 'dorg1')
+						|| (intersectedObject && intersectedObject.name === 'dorg2')
+						|| (intersectedObject && intersectedObject.name === 'folder1')
+						|| (intersectedObject && intersectedObject.name === 'logout')
+						|| (intersectedObject && intersectedObject.name === 'key_0')
+						|| (intersectedObject && intersectedObject.name === 'key_1')
+						|| (intersectedObject && intersectedObject.name === 'key_2')
+						|| (intersectedObject && intersectedObject.name === 'key_3')
+						|| (intersectedObject && intersectedObject.name === 'key_4')
+						|| (intersectedObject && intersectedObject.name === 'key_5')
+						|| (intersectedObject && intersectedObject.name === 'key_6')
+						|| (intersectedObject && intersectedObject.name === 'key_7')
+						|| (intersectedObject && intersectedObject.name === 'key_8')
+						|| (intersectedObject && intersectedObject.name === 'key_9')
+						|| (intersectedObject && intersectedObject.name === 'key_*')
+						|| (intersectedObject && intersectedObject.name === 'key_#')
+						|| (intersectedObject && intersectedObject.name === 'key_00')
+						|| (intersectedObject && intersectedObject.name === 'key_11')
+						|| (intersectedObject && intersectedObject.name === 'key_22')
+						|| (intersectedObject && intersectedObject.name === 'key_33')
+						|| (intersectedObject && intersectedObject.name === 'key_44')
+						|| (intersectedObject && intersectedObject.name === 'key_55')
+						|| (intersectedObject && intersectedObject.name === 'key_66')
+						|| (intersectedObject && intersectedObject.name === 'key_77')
+						|| (intersectedObject && intersectedObject.name === 'key_88')
+						|| (intersectedObject && intersectedObject.name === 'key_99')
+						|| (intersectedObject && intersectedObject.name === 'key_a')
+						|| (intersectedObject && intersectedObject.name === 'key_b')
+						|| (intersectedObject && intersectedObject.name === 'key_c')
+						|| (intersectedObject && intersectedObject.name === 'key_d')
+						|| (intersectedObject && intersectedObject.name === 'key_e')
+						|| (intersectedObject && intersectedObject.name === 'key_f')
+						|| (intersectedObject && intersectedObject.name === 'key_g')
+						|| (intersectedObject && intersectedObject.name === 'key_h')
+						|| (intersectedObject && intersectedObject.name === 'key_i')
+						|| (intersectedObject && intersectedObject.name === 'key_j')
+						|| (intersectedObject && intersectedObject.name === 'key_k')
+						|| (intersectedObject && intersectedObject.name === 'key_l')
+						|| (intersectedObject && intersectedObject.name === 'key_m')
+						|| (intersectedObject && intersectedObject.name === 'key_n')
+						|| (intersectedObject && intersectedObject.name === 'key_o')
+						|| (intersectedObject && intersectedObject.name === 'key_p')
+						|| (intersectedObject && intersectedObject.name === 'key_q')
+						|| (intersectedObject && intersectedObject.name === 'key_r')
+						|| (intersectedObject && intersectedObject.name === 'key_s')
+						|| (intersectedObject && intersectedObject.name === 'key_t')
+						|| (intersectedObject && intersectedObject.name === 'key_u')
+						|| (intersectedObject && intersectedObject.name === 'key_v')
+						|| (intersectedObject && intersectedObject.name === 'key_x')
+						|| (intersectedObject && intersectedObject.name === 'key_y')
+						|| (intersectedObject && intersectedObject.name === 'key_z')
+						|| (intersectedObject && intersectedObject.name === 'key_at')
+						|| (intersectedObject && intersectedObject.name === 'key_dot')) {
+
+						highlightObject(intersectedObject);
+					} else {
+						highlightObject(null);
+					}
+				}
+			}
+		});
+
+		document.body.addEventListener('mousemove', (event) => {
+			if (document.pointerLockElement === document.body) {
+				camera.rotation.y -= event.movementX / 500;
+				camera.rotation.x -= event.movementY / 500;
+			}
+		});
+
+		window.addEventListener('resize', onWindowResize);
+
+		function onWindowResize() {
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			composer.setSize(width, height);
+		}
+		let collisionCheckCounter = 0;
+		function playerCollisions() {
+			collisionCheckCounter++;
+			if (collisionCheckCounter % 2 !== 0) return;
+
+			const result = worldOctree.capsuleIntersect(playerCollider);
+
+			playerOnFloor = false;
+
+			if (result) {
+				playerOnFloor = result.normal.y > 0;
+
+				if (!playerOnFloor) {
+					playerVelocity.addScaledVector(result.normal, - result.normal.dot(playerVelocity));
+				}
+
+				if (result.depth >= 1e-10) {
+					playerCollider.translate(result.normal.multiplyScalar(result.depth));
+				}
+			}
+		}
+
+		function updatePlayer(deltaTime) {
+			let damping = Math.exp(- 4 * deltaTime) - 1;
+
+			if (!playerOnFloor) {
+				playerVelocity.y -= GRAVITY * deltaTime;
+				damping *= 0.1;
+			}
+
+			playerVelocity.addScaledVector(playerVelocity, damping);
+
+			const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
+			playerCollider.translate(deltaPosition);
+
+			playerCollisions();
+
+			camera.position.copy(playerCollider.end);
+		}
+
+		function getForwardVector() {
+			camera.getWorldDirection(playerDirection);
+			playerDirection.y = 0;
+			playerDirection.normalize();
+
+			return playerDirection;
+		}
+
+		function getSideVector() {
+			camera.getWorldDirection(playerDirection);
+			playerDirection.y = 0;
+			playerDirection.normalize();
+			playerDirection.cross(camera.up);
+
+			return playerDirection;
+		}
+
+		function controls(deltaTime) {
+			const speedDelta = deltaTime * (playerOnFloor ? 35 : 8);
+			if (keyStates['KeyW']) {
+				playerVelocity.add(getForwardVector().multiplyScalar(speedDelta));
+			}
+			if (keyStates['KeyS']) {
+				playerVelocity.add(getForwardVector().multiplyScalar(- speedDelta));
+			}
+			if (keyStates['KeyA']) {
+				playerVelocity.add(getSideVector().multiplyScalar(- speedDelta));
+			}
+			if (keyStates['KeyD']) {
+				playerVelocity.add(getSideVector().multiplyScalar(speedDelta));
+			}
+		}
+
+		const loader = new GLTFLoader().setPath('./');
+		let visualizerGroup = null;
+
+		updateLoadingProgress(5);
+
+		loader.load('test18.glb',
+			async (gltf) => {
+				updateLoadingProgress(85);
+
+				await scene.add(gltf.scene);
+				console.log(gltf.scene);
+
+				updateLoadingProgress(90);
+
+				worldOctree.fromGraphNode(gltf.scene);
+
+				updateLoadingProgress(95);
+
+				gltf.scene.traverse(child => {
+					if (child.isMesh) {
+						child.castShadow = true;
+						child.receiveShadow = true;
+
+						if (child.name === 'folder1' ||
+							child.name === 'key_0' || child.name === 'key_1' || child.name === 'key_2' ||
+							child.name === 'key_3' || child.name === 'key_4' || child.name === 'key_5' ||
+							child.name === 'key_6' || child.name === 'key_7' || child.name === 'key_8' ||
+							child.name === 'key_9' || child.name === 'key_*' || child.name === 'key_#' ||
+							child.name === 'key_00' || child.name === 'key_11' || child.name === 'key_22' ||
+							child.name === 'key_33' || child.name === 'key_44' || child.name === 'key_55' ||
+							child.name === 'key_66' || child.name === 'key_77' || child.name === 'key_88' ||
+							child.name === 'key_99' || child.name === 'key_a' || child.name === 'key_b' ||
+							child.name === 'key_c' || child.name === 'key_d' || child.name === 'key_e' ||
+							child.name === 'key_f' || child.name === 'key_g' || child.name === 'key_h' ||
+							child.name === 'key_i' || child.name === 'key_j' || child.name === 'key_k' ||
+							child.name === 'key_l' || child.name === 'key_m' || child.name === 'key_n' ||
+							child.name === 'key_o' || child.name === 'key_p' || child.name === 'key_q' ||
+							child.name === 'key_r' || child.name === 'key_s' || child.name === 'key_t' ||
+							child.name === 'key_u' || child.name === 'key_v' || child.name === 'key_x' ||
+							child.name === 'key_y' || child.name === 'key_z' || child.name === 'key_at' ||
+							child.name === 'key_dot' || child.name === 'logout') {
+							intersectableObjects.push(child);
+						}
+
+						if (child.name === 'Led') {
+							myled = child;
+						}
+
+						if (child.name === 'fan') {
+							fan = child;
+						}
+
+						if (child.name === 'fan1') {
+							fan1 = child;
+						}
+
+						if (child.name === 'fan2') {
+							fan2 = child;
+						}
+
+						if (child.name === 'fan3') {
+							fan3 = child;
+						}
+
+						if (child.name === 'fan4') {
+							fan4 = child;
+						}
+
+						if (child.name === 'fan5') {
+							fan5 = child;
+						}
+
+						if (child.name === "door_handle") {
+							door_handle = child;
+						}
+
+						if (child.name === 'Radio') {
+							radioObject = child;
+
+							visualizerGroup = createAudioVisualizer();
+							const radioPosition = new THREE.Vector3(0.7820355892181396, 1.9366478443145752, -2.56173978805542);
+							const radioRotation = new THREE.Vector3(1.2264926675750791, 0, 0);
+							visualizerGroup.position.copy(radioPosition);
+							visualizerGroup.rotation.copy(radioRotation);
+							scene.add(visualizerGroup);
+						}
+
+						if (child.material.map) {
+							child.material.map.anisotropy = 4;
+						}
+					}
+				});
+
+				updateLoadingProgress(100);
+			},
+
+			(progress) => {
+				if (progress.lengthComputable) {
+					const percent = 5 + (progress.loaded / progress.total) * 75;
+					updateLoadingProgress(percent);
+				} else {
+					const currentTime = Date.now();
+					if (!loader.startTime) loader.startTime = currentTime;
+					const elapsed = currentTime - loader.startTime;
+					const estimatedPercent = Math.min(75, 5 + (elapsed / 10000) * 75);
+					updateLoadingProgress(estimatedPercent);
+				}
+			},
+
+			(error) => {
+				console.error('Error loading model:', error);
+				const loadingText = document.getElementById('loadingText');
+				if (loadingText) {
+					loadingText.textContent = 'Error loading model. Click to continue anyway.';
+					loadingText.style.color = '#ff6b6b';
+				}
+
+				setTimeout(() => {
+					updateLoadingProgress(100);
+				}, 2000);
+			}
+		);
+
+		if ("0" == -null)
+			console.log("equal");
+		else
+			console.log("not equal");
+
+		function teleportPlayerIfOob() {
+
+			if (camera.position.y <= - 25) {
+
+				playerCollider.start.set(4.66755, 0.2, 14.7096);
+				playerCollider.end.set(4.66755, 2.4, 14.7096);
+				playerCollider.radius = 0.15;
+				camera.position.copy(playerCollider.end);
+				camera.rotation.set(0, 0, 0);
+				camera.position.set(4.66755, 0, 14.7096);
+
+			}
+
+		}
+
+		function animate() {
+			const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
+
+			for (let i = 0; i < STEPS_PER_FRAME; i++) {
+				controls(deltaTime);
+				updatePlayer(deltaTime);
+				teleportPlayerIfOob();
+			}
+			updateFlashlight();
+			updateLOD();
+			animateFov();
+
+			if (fan) {
+				fan.rotation.z += deltaTime * 10900.0;
+				fan1.rotation.z += deltaTime * 500.0;
+				fan2.rotation.z += deltaTime * 0.0;
+				fan3.rotation.z += deltaTime * 10900.0;
+				fan4.rotation.z += deltaTime * 10900.0;
+				fan5.rotation.z += deltaTime * 10900.0;
+			}
+			papers.forEach(paper => {
+				if (!paper.userData.isAnimating && paper.userData.floatOffset !== undefined) {
+					const time = Date.now() * 0.001;
+					paper.position.y += Math.sin(time * paper.userData.floatSpeed + paper.userData.floatOffset) * 0.002;
+					paper.rotation.z += 0.001;
+				}
+			});
+
+			document.getElementById("text1").textContent = "password: " + password;
+			document.getElementById("text2").textContent = "email: " + email;
+
+			composer.render();
+		}
+
+		function createLODObject(highDetailMesh, mediumDetailMesh, lowDetailMesh) {
+			const lod = new THREE.LOD();
+			lod.addLevel(highDetailMesh, 1000);
+			lod.addLevel(mediumDetailMesh, 1000);
+			lod.addLevel(lowDetailMesh, 0);
+			return lod;
+		}
+
+		function updateLOD() {
+			scene.traverse(child => {
+				if (child.isLOD) {
+					child.update(camera);
+				}
+			});
+		}
+
+	</script>
+</body>
+
+</html>
